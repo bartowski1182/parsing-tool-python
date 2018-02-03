@@ -87,5 +87,4 @@ with open('nuforcScrape.csv', 'rb') as csvfile:
             row.append('New Years Eve')
 
 
-        print(', '.join(row))
-
+        print(','.join(row))
