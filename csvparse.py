@@ -601,6 +601,6 @@ with open('nuforcScrape.csv', 'rb') as csvfile:
         elif date.month == 12 and date.day == 31:
             row.append('New Years Eve')
 
-        row.append(str(date.date()))     
+        row.append(str(date.day))     
 
         print('$'.join(row))
