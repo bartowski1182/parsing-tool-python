@@ -36,13 +36,13 @@ costKey = 1
 weatherKey = 1
 popStatsKey = 1
 
-wbRD = xlrd.open_workbook("/home/colin/Downloads/CanadianDisasterDatabase.xlsx")
+wbRD = xlrd.open_workbook("./CanadianDisasterDatabase.xlsx")
 sheets = wbRD.sheets()
 
 date = open("date.csv", "w")
 fact = open("fact.csv", "w")
 disaster = open("disaster.csv", "w")
-#summary = open("summary.csv", "w")
+summary = open("summary.csv", "w")
 cost = open("cost.csv", "w")
 location = open("location.csv", "w")
 
@@ -68,7 +68,278 @@ for sheet in sheets:
             continue
         #print(row)
 
-        cost.write(str(costKey) + "$" + str(sheet.cell(row, ESTIMATED_TOTAL_COST_INDEX).value) + "$" + str(sheet.cell(row, NORMALIZED_TOTAL_COST_INDEX).value) + "$" + str(sheet.cell(row, FEDERAL_DFAA_PAYMENTS_INDEX).value) + "$" + str(sheet.cell(row, PROVINCIAL_DFAA_PAYMENTS).value) + "$" + str(sheet.cell(row, INSURANCE_PAYMENTS_INDEX).value) + "$" + str(sheet.cell(row, PROVINCIAL_DEPARTMENT_PAYMENTS_INDEX).value) + "$" + str(sheet.cell(row, MUNICIPAL_COSTS_INDEX).value) + "$" + str(sheet.cell(row, OGD_COSTS_INDEX).value) + "$" + str(sheet.cell(row, NGO_PAYMENTS_INDEX).value) + "\n")
+        cities = []
+
+        locationCell = str(sheet.cell(row, PLACE_INDEX).value.encode("utf-8"))
+        provinceList = []
+        if (row == 32):
+            province = "Ontario"
+            cities = ["Toronto"]
+        elif (locationCell.strip() == "Prairie Provinces" or locationCell.strip() == "Prairies Provinces" or locationCell.strip() == "Southern Prairies" or locationCell.strip() == "Western Prairies"):
+            provinceList = ["Alberta", "Manitoba", "Saskatchewan"]
+        elif (locationCell.strip() == "Across Canada"):
+            provinceList = ["Quebec", "Ontario", "Newfoundland and Labrador", "Yukon", "Nunavut", "Northwest Territories", "British Columbia", "Saskatchewan", "Manitoba", "New Brunswick", "Prince Edward Island", "Nova Scotia", "Alberta"]
+        elif (locationCell.strip().lower() == "maritime provinces" or locationCell.strip().lower() == "martime provinces"):
+            provinceList = ["Newfoundland and Labrador", "New Brunswick", "Nova Scotia"]
+        elif (locationCell.strip().lower() == "eastern canada"):
+            provinceList = ["Newfoundland and Labrador", "New Brunswick", "Nova Scotia", "Ontaio", "Prince Edward Island", "Quebec"]
+        elif (locationCell.strip() == "Lakes Huron, Erie and Ontario"):
+            provinceList = ["Ontario"]
+        elif (locationCell.strip() == "Northumberland Strait (NS and PE)"):
+            provinceList = ["Nova Scotia", "Prince Edward Island"]
+        elif (locationCell.strip() == "Southern Alberta and Saskatchewan" or locationCell.strip() == "Alberta and Saskatchewan"):
+            provinceList = ["Alberta", "Saskatchewan"]
+        elif (locationCell.strip() == "Prairies Provinces and Ontario"):
+            provinceList = ["Ontario", "Alberta", "Manitoba", "Saskatchewan"]
+        elif (locationCell.strip() == "Quebec and Ontario"):
+            provinceList = ["Ontario", "Quebec"]
+        elif (locationCell.strip() == "Across Toronto, Canada, and internationally"):
+            provinceList = ["Quebec", "Ontario", "Newfoundland and Labrador", "Yukon", "Nunavut", "Northwest Territories", "British Columbia", "Saskatchewan", "Manitoba", "New Brunswick", "Prince Edward Island", "Nova Scotia", "Alberta"]
+        elif (locationCell.strip() == "Western Canada"):
+            provinceList = ["British Columbia", "Alberta", "Saskatchewan", "Manitoba"]
+        elif (locationCell.strip() == "Across Canada, largely in the Greater Toronto area"):
+            provinceList = ["Ontario"]
+        elif (locationCell.strip() == "New Brunswick and Nova Scotia"):
+            provinceList = ["New Brunswick", "Nova Scotia"]
+        elif (locationCell.strip() == "Nova Scotia, Prince Edward Island and Newfoundland"):
+            provinceList = ["Nova Scotia", "Prince Edward Island", "Newfoundland"]
+        elif (locationCell.strip() == "New Brunswick and Quebec"):
+            provinceList = ["New Brunswick", "Quebec"]
+        elif (locationCell.strip() == "Yukon, Northwest Territories and British Columbia"):
+            provinceList = ["Yukon", "Northwest Territories", "British Columbia"]
+        elif (locationCell.strip() == "Fort Albany and Kashcewan First Nation"):
+            provinceList = ["Ontario"]
+        elif (locationCell.strip() == " Alberta, Saskatchewan, Manitoba and Ontario"):
+            provinceList = ["Alberta", "Saskatchewan", "Manitoba", "Ontario"]
+        elif (locationCell.strip() == "St. Lawrence River"):
+            provinceList = ["Quebec"]
+        elif (locationCell.strip() == "St. Lawrence River"):
+            provinceList = ["Quebec"]
+        elif (locationCell.find("ON") != -1 or locationCell.find("Ontario") != -1):
+            province = "Ontario"
+            locationCell = locationCell.split("ON")[0]
+            locationCell = locationCell.split("Ontario")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Toronto")
+        elif (locationCell.find("QC") != -1 or locationCell.find("Quebec") != -1 or locationCell.find("Québec") != -1):
+            province = "Quebec"
+            locationCell = locationCell.split("QC")[0]
+            locationCell = locationCell.split("Quebec")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Quebec")
+        elif (locationCell.find("NL") != -1 or locationCell.find("Newfoundland") != -1 or locationCell.find("Labrador") != -1):
+            province = "Newfoundland and Labrador"
+            locationCell = locationCell.split("NL")[0]
+            locationCell = locationCell.split("Newfoundland")[0]
+            locationCell = locationCell.split("Labrador")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("St. Johns")
+        elif (locationCell.find("PE") != -1 or locationCell.find("Prince Edward") != -1):
+            province = "Prince Edward Island"
+            locationCell = locationCell.split("PE")[0]
+            locationCell = locationCell.split("Prince Edward")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Charlottetown")
+        elif (locationCell.find("NS") != -1 or locationCell.find("Nova Scotia") != -1):
+            province = "Nova Scotia"
+            locationCell = locationCell.split("NS")[0]
+            locationCell = locationCell.split("Nova Scotia")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Halifax")
+        elif (locationCell.find("NB") != -1 or locationCell.find("New Brunswick") != -1):
+            province = "New Brunswick"
+            locationCell = locationCell.split("NB")[0]
+            locationCell = locationCell.split("New Brunswick")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Moncton")
+        elif (locationCell.find("MB") != -1 or locationCell.find("Manitoba") != -1):
+            province = "Manitoba"
+            locationCell = locationCell.split("MB")[0]
+            locationCell = locationCell.split("Manitoba")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Winnipeg")
+        elif (locationCell.find("SK") != -1 or locationCell.find("Saskatchewan") != -1):
+            province = "Saskatchewan"
+            locationCell = locationCell.split("SK")[0]
+            locationCell = locationCell.split("Saskatchewan")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Saskatoon")
+        elif (locationCell.find("AB") != -1 or locationCell.find("Alberta") != -1):
+            province = "Alberta"
+            locationCell = locationCell.split("AB")[0]
+            locationCell = locationCell.split("Alberta")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Calgary")
+        elif (locationCell.find("BC") != -1 or locationCell.find("British Columbia") != -1):
+            province = "British Columbia"
+            locationCell = locationCell.split("BC")[0]
+            locationCell = locationCell.split("British Columbia")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Vancouver")
+        elif (locationCell.find("YT") != -1 or locationCell.find("Yukon") != -1):
+            province = "Yukon"
+            locationCell = locationCell.split("YT")[0]
+            locationCell = locationCell.split("Yukon")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Whitehorse")
+        elif (locationCell.find("NT") != -1 or locationCell.find("Northwest Territories") != -1):
+            province = "Northwest Territories"
+            locationCell = locationCell.split("NT")[0]
+            locationCell = locationCell.split("Northwest Territories")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Yellowknife")
+        elif (locationCell.find("NU") != -1 or locationCell.find("Nunavut") != -1):
+            province = "Nunavut"
+            locationCell = locationCell.split("NU")[0]
+            locationCell = locationCell.split("Nunavut")[0]
+            if (len(locationCell.split(" and ")) > 1):
+                cities.append(locationCell.split(" and ")[1])
+                locationCell = locationCell.split(" and ")[0]
+                if (len(locationCell.split(", ")) > 1):
+                    cities.extend(locationCell.split(", "))
+                else:
+                    cities.append(locationCell)
+            elif (locationCell.strip() != ""):
+                cities.append(locationCell.strip())
+            else:
+                cities.append("Iqaluit")
+        else:
+            continue
+
+        if (not cities or cities[0] == "") and not provinceList:
+            continue 
+
+        keywordList = []
+
+        comment = str(sheet.cell(row, COMMENT_INDEX).value.encode("utf-8"))
+
+        if(comment.lower().find("homeless") != -1):
+            keywordList.append("homeless")
+        if(comment.lower().find("died") != -1):
+            keywordList.append("died")
+        if(comment.lower().find("injured") != -1):
+            keywordList.append("injured")
+        if(comment.lower().find("lost") != -1):
+            keywordList.append("lost")
+
+        keywordList.extend(['','',''])
+
+        keywordString = ''
+
+        for i in range(0,3):
+            keywordString = keywordString + '^' + keywordList[i]
+
+        summary.write(str(descriptionKey) + '^' + comment + keywordString + '\n')        
+
+        cost.write(str(costKey) + "^" + str(sheet.cell(row, ESTIMATED_TOTAL_COST_INDEX).value) + "^" + str(sheet.cell(row, NORMALIZED_TOTAL_COST_INDEX).value) + "^" + str(sheet.cell(row, FEDERAL_DFAA_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, PROVINCIAL_DFAA_PAYMENTS).value) + "^" + str(sheet.cell(row, INSURANCE_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, PROVINCIAL_DEPARTMENT_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, MUNICIPAL_COSTS_INDEX).value) + "^" + str(sheet.cell(row, OGD_COSTS_INDEX).value) + "^" + str(sheet.cell(row, NGO_PAYMENTS_INDEX).value) + "\n")
 
         year, month, day, hour, minute, sec = xlrd.xldate_as_tuple(int(sheet.cell(row, EVENT_START_DATE_INDEX).value), wbRD.datemode)
         startDate = datetime.datetime(year, month, day, hour, minute)
@@ -331,7 +602,7 @@ for sheet in sheets:
         intSeason = (next(season for season, (start, end) in internationalSeason
             if start <= tempDate.date() <= end))
 
-        date.write(str(startDateKey) + "$" + str(startDate.day) + "$" + startDate.strftime('%B') + "$" + str(startDate.year) + "$" + weekday + "$" + season + "$" + intSeason + "\n")
+        date.write(str(startDateKey) + "^" + str(startDate.day) + "^" + startDate.strftime('%B') + "^" + str(startDate.year) + "^" + weekday + "^" + season + "^" + intSeason + "\n")
 
         year, month, day, hour, minute, sec = xlrd.xldate_as_tuple(int(sheet.cell(row, EVENT_END_DATE_INDEX).value), wbRD.datemode)
         endDate = datetime.datetime(year, month, day, hour, minute)
@@ -344,226 +615,10 @@ for sheet in sheets:
         intSeason = (next(season for season, (start, end) in internationalSeason
             if start <= tempDate.date() <= end))
 
+        date.write(str(endDateKey) + "^" + str(endDate.day) + "^" + endDate.strftime('%B') + "^" + str(endDate.year) + "^" + weekday + "^" + season + "^" + intSeason + "\n")
 
-        date.write(str(endDateKey) + "$" + str(endDate.day) + "$" + endDate.strftime('%B') + "$" + str(endDate.year) + "$" + weekday + "$" + season + "$" + intSeason + "\n")
+        disaster.write(str(disasterKey) + "^" + str(sheet.cell(row, EVENT_TYPE_INDEX).value) + "^" + str(sheet.cell(row, EVENT_SUBGROUP_INDEX).value) + "^" + str(sheet.cell(row, EVENT_GROUP_INDEX).value) + "^" + str(sheet.cell(row, EVENT_CATEGORY_INDEX).value) + "^" + str(sheet.cell(row, EVENT_TYPE_INDEX).value) + "^" + str(sheet.cell(row, MAGNITUDE_INDEX).value) + "^" + str(sheet.cell(row, UTILITY_PEOPLE_AFFECTED_INDEX).value) + "\n")
 
-        disaster.write(str(disasterKey) + "$" + str(sheet.cell(row, EVENT_TYPE_INDEX).value) + "$" + str(sheet.cell(row, EVENT_SUBGROUP_INDEX).value) + "$" + str(sheet.cell(row, EVENT_GROUP_INDEX).value) + "$" + str(sheet.cell(row, EVENT_CATEGORY_INDEX).value) + "$" + str(sheet.cell(row, EVENT_TYPE_INDEX).value) + "$" + str(sheet.cell(row, MAGNITUDE_INDEX).value) + "$" + str(sheet.cell(row, UTILITY_PEOPLE_AFFECTED_INDEX).value) + "\n")
-
-
-        cities = []
-
-        locationCell = str(sheet.cell(row, PLACE_INDEX).value.encode("utf-8"))
-        provinceList = []
-        if (row == 32):
-            province = "Ontario"
-            cities = ["Toronto"]
-        elif (locationCell.strip() == "Prairie Provinces" or locationCell.strip() == "Prairies Provinces"):
-            provinceList = ["Alberta", "Manitoba", "Saskatchewan"]
-        elif (locationCell.strip() == "Across Canada"):
-            provinceList = ["Quebec", "Ontario", "Newfoundland and Labrador", "Yukon", "Nunavut", "Northwest Territories", "British Columbia", "Saskatchewan", "Manitoba", "New Brunswick", "Prince Edward Island", "Nova Scotia", "Alberta"]
-        elif (locationCell.strip().lower() == "maritime provinces" or locationCell.strip().lower() == "martime provinces"):
-            provinceList = ["Newfoundland and Labrador", "New Brunswick", "Nova Scotia"]
-        elif (locationCell.find("ON") != -1 or locationCell.find("Ontario") != -1):
-            province = "Ontario"
-            locationCell = locationCell.split("ON")[0]
-            locationCell = locationCell.split("Ontario")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Toronto")
-        elif (locationCell.find("QC") != -1 or locationCell.find("Quebec") != -1 or locationCell.find("Québec") != -1):
-            province = "Quebec"
-            locationCell = locationCell.split("QC")[0]
-            locationCell = locationCell.split("Quebec")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Quebec")
-        elif (locationCell.find("NL") != -1 or locationCell.find("Newfoundland") != -1 or locationCell.find("Labrador") != -1):
-            province = "Newfoundland and Labrador"
-            locationCell = locationCell.split("NL")[0]
-            locationCell = locationCell.split("Newfoundland")[0]
-            locationCell = locationCell.split("Labrador")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("St. Johns")
-        elif (locationCell.find("PE") != -1 or locationCell.find("Prince Edward") != -1):
-            province = "Prince Edward Island"
-            locationCell = locationCell.split("PE")[0]
-            locationCell = locationCell.split("Prince Edward")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Charlottetown")
-        elif (locationCell.find("NS") != -1 or locationCell.find("Nova Scotia") != -1):
-            province = "Nova Scotia"
-            locationCell = locationCell.split("NS")[0]
-            locationCell = locationCell.split("Nova Scotia")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Halifax")
-        elif (locationCell.find("NB") != -1 or locationCell.find("New Brunswick") != -1):
-            province = "New Brunswick"
-            locationCell = locationCell.split("NB")[0]
-            locationCell = locationCell.split("New Brunswick")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Moncton")
-        elif (locationCell.find("MB") != -1 or locationCell.find("Manitoba") != -1):
-            province = "Manitoba"
-            locationCell = locationCell.split("MB")[0]
-            locationCell = locationCell.split("Manitoba")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Winnipeg")
-        elif (locationCell.find("SK") != -1 or locationCell.find("Saskatchewan") != -1):
-            province = "Saskatchewan"
-            locationCell = locationCell.split("SK")[0]
-            locationCell = locationCell.split("Saskatchewan")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Saskatoon")
-        elif (locationCell.find("AB") != -1 or locationCell.find("Alberta") != -1):
-            province = "Alberta"
-            locationCell = locationCell.split("AB")[0]
-            locationCell = locationCell.split("Alberta")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Calgary")
-        elif (locationCell.find("BC") != -1 or locationCell.find("British Columbia") != -1):
-            province = "British Columbia"
-            locationCell = locationCell.split("BC")[0]
-            locationCell = locationCell.split("British Columbia")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Vancouver")
-        elif (locationCell.find("YT") != -1 or locationCell.find("Yukon") != -1):
-            province = "Yukon"
-            locationCell = locationCell.split("YT")[0]
-            locationCell = locationCell.split("Yukon")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Whitehorse")
-        elif (locationCell.find("NT") != -1 or locationCell.find("Northwest Territories") != -1):
-            province = "Northwest Territories"
-            locationCell = locationCell.split("NT")[0]
-            locationCell = locationCell.split("Northwest Territories")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Yellowknife")
-        elif (locationCell.find("NU") != -1 or locationCell.find("Nunavut") != -1):
-            province = "Nunavut"
-            locationCell = locationCell.split("NU")[0]
-            locationCell = locationCell.split("Nunavut")[0]
-            if (len(locationCell.split(" and ")) > 1):
-                cities.append(locationCell.split(" and ")[1])
-                locationCell = locationCell.split(" and ")[0]
-                if (len(locationCell.split(", ")) > 1):
-                    cities.extend(locationCell.split(", "))
-                else:
-                    cities.append(locationCell)
-            elif (locationCell.strip() != ""):
-                cities.append(locationCell.strip())
-            else:
-                cities.append("Iqaluit")
-        else:
-            print "ERROR IN THIS CELL: " + str(sheet.cell(row, PLACE_INDEX).value.encode("utf-8")) + "  in row: " + str(row)
-
-        if (not cities or cities[0] == "") and not provinceList:
-            print "ERROR IN THIS CELL: " + str(sheet.cell(row, PLACE_INDEX).value.encode("utf-8")) + "  in row: " + str(row)
 
         for province in provinceList:
             if province == "Quebec":
@@ -592,21 +647,23 @@ for sheet in sheets:
                 city = "Halifax"
             elif province == "Alberta":
                 city = "Calgary"
-            location.write(str(locationKey) + "$" + city + "$" + province + "$y\n") 
-            fact.write(str(startDateKey) + "$" + str(endDateKey) + "$" + str(locationKey) + "$" + str(disasterKey) + "$" + str(descriptionKey) + "$" + str(costKey) + "$" + str(popStatsKey) + "$" + str(weatherKey) + "$" + str(sheet.cell(row, FATALITIES_INDEX).value) + "$" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "$" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
+            location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
+            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(weatherKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
 
         for city in cities:
-            location.write(str(locationKey) + "$" + city + "$" + province + "$y\n") 
-            fact.write(str(startDateKey) + "$" + str(endDateKey) + "$" + str(locationKey) + "$" + str(disasterKey) + "$" + str(descriptionKey) + "$" + str(costKey) + "$" + str(popStatsKey) + "$" + str(weatherKey) + "$" + str(sheet.cell(row, FATALITIES_INDEX).value) + "$" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "$" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
+            location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
+            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(weatherKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
         startDateKey = startDateKey + 2
         endDateKey = endDateKey + 2
         disasterKey = disasterKey + 1
         costKey = costKey + 1
+        descriptionKey = descriptionKey + 1
         
 fact.close()
 date.close()
 disaster.close()
 cost.close()
 location.close()
+summary.close()
