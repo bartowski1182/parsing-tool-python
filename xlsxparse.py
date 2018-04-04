@@ -648,12 +648,12 @@ for sheet in sheets:
             elif province == "Alberta":
                 city = "Calgary"
             location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
-            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(weatherKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
+            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
 
         for city in cities:
             location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
-            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(weatherKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
+            fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
         startDateKey = startDateKey + 2
         endDateKey = endDateKey + 2
