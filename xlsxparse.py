@@ -337,7 +337,7 @@ for sheet in sheets:
         for i in range(0,3):
             keywordString = keywordString + '^' + keywordList[i]
 
-        summary.write(str(descriptionKey) + '^' + comment + keywordString + '\n')        
+        summary.write(str(descriptionKey) + '^"' + comment + '"' + keywordString + '\n')        
 
         cost.write(str(costKey) + "^" + str(sheet.cell(row, ESTIMATED_TOTAL_COST_INDEX).value) + "^" + str(sheet.cell(row, NORMALIZED_TOTAL_COST_INDEX).value) + "^" + str(sheet.cell(row, FEDERAL_DFAA_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, PROVINCIAL_DFAA_PAYMENTS).value) + "^" + str(sheet.cell(row, INSURANCE_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, PROVINCIAL_DEPARTMENT_PAYMENTS_INDEX).value) + "^" + str(sheet.cell(row, MUNICIPAL_COSTS_INDEX).value) + "^" + str(sheet.cell(row, OGD_COSTS_INDEX).value) + "^" + str(sheet.cell(row, NGO_PAYMENTS_INDEX).value) + "\n")
 
@@ -650,16 +650,19 @@ for sheet in sheets:
             location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
             fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
+            factKey = factKey + 1
 
         for city in cities:
             location.write(str(locationKey) + "^" + city + "^" + province + "^y\n") 
             fact.write(str(startDateKey) + "^" + str(endDateKey) + "^" + str(locationKey) + "^" + str(disasterKey) + "^" + str(descriptionKey) + "^" + str(costKey) + "^" + str(popStatsKey) + "^" + str(sheet.cell(row, FATALITIES_INDEX).value) + "^" + str(sheet.cell(row, INJURED_INFECTED_INDEX).value) + "^" + str(sheet.cell(row, EVACUATED_INDEX).value) + "\n")
             locationKey = locationKey + 1
+            factKey = factKey + 1
         startDateKey = startDateKey + 2
         endDateKey = endDateKey + 2
         disasterKey = disasterKey + 1
         costKey = costKey + 1
         descriptionKey = descriptionKey + 1
+        factKey = factKey + 1
         
 fact.close()
 date.close()
